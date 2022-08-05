@@ -9,7 +9,7 @@ library(processx)
 
 #==========================================================================================================
 
-##2. Create colorsclae 
+##2. Create colorscale 
   #We take colors from Viridis scale and add orange and red
 colors_figures <- c("#440154", "#3b528b", "#21918c", "#5FC989","#5ec962", "#fde725", "#FF5733", "#ED1313")
 
@@ -30,7 +30,7 @@ a_synfuel <- 0.4
 b_synfuel <- 3.14
 c_synfuel <- 0.8
 
-# Create a black matrix
+# Create a blank matrix
 z1 <- matrix(,nrow = length(carbon_cost), ncol = length(hydrogen_cost))
     #NOTE: matrix[row, column] = value 
     #This means that we name first the row (y value), and then the column (x value)
