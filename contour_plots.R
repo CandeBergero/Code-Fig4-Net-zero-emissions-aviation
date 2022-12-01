@@ -1,13 +1,13 @@
 # Code to generate contour plots for costs of different biofuels for net-zero aviation paper
 
 ##1. Load relevant libraries
-install.packages("ggplot2")
+#install.packages("ggplot2")
 library(ggplot2)
 
 library(ContourFunctions)
 library(plotly)
 
-install.packages("RColorBrewer")
+#install.packages("RColorBrewer")
 library(RColorBrewer)
 
 library(processx)
@@ -71,9 +71,9 @@ fig_synfuels <- plot_ly(x = hydrogen_cost, #This is the column in matrix
                        contours = list(
                          showlabels = TRUE,
                          coloring = "heatmap",
-                         size = 1,
+                         size = 0.5,
                          start = 0,
-                         end = 10
+                         end = 6
                        )) %>%
   
   layout(title = "Synthetic Fuels",
@@ -138,9 +138,9 @@ fig_synfuels_liter <- plot_ly(x = hydrogen_cost, #This is the column in matrix
                         contours = list(
                           showlabels = TRUE,
                           coloring = "heatmap",
-                          size = 1,
+                          size = 0.5,
                           start = 0,
-                          end = 10
+                          end = 6
                         )) %>%
 
   layout(title = "Synthetic Fuels",
@@ -212,9 +212,9 @@ fig_synfuels_liter_with_CDR <- plot_ly(x = hydrogen_cost, #This is the column in
                               contours = list(
                                 showlabels = TRUE,
                                 coloring = "heatmap",
-                                size = 1,
+                                size = 0.5,
                                 start = 0,
-                                end = 10
+                                end = 6
                               )) %>%
   
   layout(title = "Synthetic Fuels & CDR",
@@ -249,28 +249,28 @@ orca(fig_synfuels_liter_with_CDR, "fig4_synthetic_fuels_liter_with_CDR.svg")
 #Cost = (0.17 + 0.34 + Feedstock cost ) * Y (Inversed efficiency)
 
 #Create x & y arrays
-biomass_cost <- seq(0, 0.9, by = 0.1) #Delivered biomass cost in $/kg biomass
-conv_eff <-  as.numeric(0:7) #Conversion efficiency (kg biomass / kg fuel)
+HEFA_cost <- seq(0, 1, by = 0.2) #Delivered biomass cost in $/kg biomass
+HEFA_conv_eff <-  as.numeric(0:2) #Conversion efficiency (kg biomass / kg fuel)
 
 #Define constants from equation
 a_HEFA <- 0.17 + 0.34
 
 # Create a blank matrix
-  # rows will be conversion efficiency (0 to 7)
+  # rows will be conversion efficiency (0 to 4)
   # columns will be biomass cost (0 to 0.9)
-z2 <- matrix(,nrow = length(biomass_cost), ncol = length(conv_eff))
+z2 <- matrix(,nrow = length(HEFA_cost), ncol = length(HEFA_conv_eff))
 
 # Iterate through arrays to populate matrix
-for (i in 1:length(biomass_cost)){
-  for (j in 1:length(conv_eff)){
-    z2[i, j] <- ((biomass_cost[i] + a_HEFA) * conv_eff[j])
+for (i in 1:length(HEFA_cost)){
+  for (j in 1:length(HEFA_conv_eff)){
+    z2[i, j] <- ((HEFA_cost[i] + a_HEFA) * HEFA_conv_eff[j])
   }
 
 }
 
 # contour(z)
-fig_HEFA <- plot_ly(x = conv_eff, # This represents columns
-                    y = biomass_cost, # This represents rows
+fig_HEFA <- plot_ly(x = HEFA_conv_eff, # This represents columns
+                    y = HEFA_cost, # This represents rows
                         z = z2,
                         type = "contour",
                         colorbar = list(bordercolor = "black",
@@ -281,19 +281,19 @@ fig_HEFA <- plot_ly(x = conv_eff, # This represents columns
                     contours = list(
                       showlabels = TRUE,
                       coloring = "heatmap",
-                      size = 1,
+                      size = 0.5,
                       start = 0,
-                      end = 10
+                      end = 6
                     )) %>% #"fill" is default, which is no gradient
 
   layout(title = "HEFA",
          xaxis = list(
            title = "Conversion Efficiency (kg biomass / kg fuel)",
-           nticks = 8
+           nticks = 3
          ),
          yaxis = list(
            title = "Cost of Delivered Biomass (USD / kg biomass)",
-           nticks = 10
+           nticks = 6
          ),
          margin = list (
            b = 60,
@@ -324,19 +324,19 @@ biofuels_liter_multiplier <- 0.88 #kg per liters
 # Create a blank matrix
 # rows will be conversion efficiency (0 to 7)
 # columns will be biomass cost (0 to 0.9)
-z2_liter<- matrix(,nrow = length(biomass_cost), ncol = length(conv_eff))
+z2_liter<- matrix(,nrow = length(HEFA_cost), ncol = length(HEFA_conv_eff))
 
 # Iterate through arrays to populate matrix
-for (i in 1:length(biomass_cost)){
-  for (j in 1:length(conv_eff)){
-    z2_liter[i, j] <- ((biomass_cost[i] + a_HEFA) * biofuels_liter_multiplier * conv_eff[j])
+for (i in 1:length(HEFA_cost)){
+  for (j in 1:length(HEFA_conv_eff)){
+    z2_liter[i, j] <- ((HEFA_cost[i] + a_HEFA) * biofuels_liter_multiplier * HEFA_conv_eff[j])
   }
 
 }
 
 # contour(z)
-fig_HEFA_liter <- plot_ly(x = conv_eff, # This represents columns
-                    y = biomass_cost, # This represents rows
+fig_HEFA_liter <- plot_ly(x = HEFA_conv_eff, # This represents columns
+                    y = HEFA_cost, # This represents rows
                     z = z2_liter,
                     type = "contour",
                     colorbar = list(bordercolor = "black",
@@ -347,9 +347,9 @@ fig_HEFA_liter <- plot_ly(x = conv_eff, # This represents columns
                     contours = list(
                       showlabels = TRUE,
                       coloring = "heatmap",
-                      size = 1,
+                      size = 0.5,
                       start = 0,
-                      end = 10
+                      end = 6
                     )) %>% #"fill" is default, which is no gradient
 
 
@@ -393,19 +393,19 @@ biofuel_offset_cost = total_nonCO2_l_biodiesel * (CDR_cost_assumed/1000)
 # Create a blank matrix
 # rows will be conversion efficiency (0 to 7)
 # columns will be biomass cost (0 to 0.9)
-z2_liter_with_CDR <- matrix(,nrow = length(biomass_cost), ncol = length(conv_eff))
+z2_liter_with_CDR <- matrix(,nrow = length(HEFA_cost), ncol = length(HEFA_conv_eff))
 
 # Iterate through arrays to populate matrix
-for (i in 1:length(biomass_cost)){
-  for (j in 1:length(conv_eff)){
-    z2_liter_with_CDR[i, j] <- ((biomass_cost[i] + a_HEFA) * biofuels_liter_multiplier * conv_eff[j]) + biofuel_offset_cost
+for (i in 1:length(HEFA_cost)){
+  for (j in 1:length(HEFA_conv_eff)){
+    z2_liter_with_CDR[i, j] <- ((HEFA_cost[i] + a_HEFA) * biofuels_liter_multiplier * HEFA_conv_eff[j]) + biofuel_offset_cost
   }
   
 }
 
 # contour(z)
-fig_HEFA_liter_with_CDR <- plot_ly(x = conv_eff, # This represents columns
-                          y = biomass_cost, # This represents rows
+fig_HEFA_liter_with_CDR <- plot_ly(x = HEFA_conv_eff, # This represents columns
+                          y = HEFA_cost, # This represents rows
                           z = z2_liter_with_CDR,
                           type = "contour",
                           colorbar = list(bordercolor = "black",
@@ -416,9 +416,9 @@ fig_HEFA_liter_with_CDR <- plot_ly(x = conv_eff, # This represents columns
                           contours = list(
                             showlabels = TRUE,
                             coloring = "heatmap",
-                            size = 1,
+                            size = 0.5,
                             start = 0,
-                            end = 10
+                            end = 6
                           )) %>% #"fill" is default, which is no gradient
   
   
@@ -451,7 +451,9 @@ orca(fig_HEFA_liter_with_CDR, "fig4_HEFA_liter_with_CDR.svg")
 # CAPEX – 7.6 USD/GJ biofuel (0.07 USD/kg biomass), OPEX – 13.5 USD/GJ biofuel (0.12 USD/kg biomass)
 # Cost = (0.07 + 0.12 + Feedstock cost ) * Y (Inverse efficiency)
 
-#We use same x & y arrays as in HEFA
+#Create x & y arrays
+FT_cost <- seq(0, 0.7, by = 0.1) #Delivered biomass cost in $/kg biomass
+FT_conv_eff <-  as.numeric(0:4) #Conversion efficiency (kg biomass / kg fuel)
 
 #Define constants from equation
 a_FT <- 0.07 + 0.12
@@ -459,19 +461,19 @@ a_FT <- 0.07 + 0.12
 # Create a blank matrix
 # rows will be conversion efficiency (0 to 7)
 # columns will be biomass cost (0 to 0.9)
-z3<- matrix(,nrow = length(biomass_cost), ncol = length(conv_eff))
+z3<- matrix(,nrow = length(FT_cost), ncol = length(FT_conv_eff))
 
 # Iterate through arrays to populate matrix
-for (i in 1:length(biomass_cost)){
-  for (j in 1:length(conv_eff)){
-    z3[i, j] <- ((biomass_cost[i] + a_FT) * conv_eff[j])
+for (i in 1:length(FT_cost)){
+  for (j in 1:length(FT_conv_eff)){
+    z3[i, j] <- ((FT_cost[i] + a_FT) * FT_conv_eff[j])
   }
 
 }
 
 # contour(z)
-fig_FT <- plot_ly(x = conv_eff, # This represents columns
-                  y = biomass_cost, # This represents rows
+fig_FT <- plot_ly(x = FT_conv_eff, # This represents columns
+                  y = FT_cost, # This represents rows
                   z = z3,
                   type = "contour",
                   colors = colors_figures_2,
@@ -483,19 +485,19 @@ fig_FT <- plot_ly(x = conv_eff, # This represents columns
                   contours = list(
                     showlabels = TRUE,
                     coloring = "heatmap",
-                    size = 1,
-                    start = 1,
-                    end = 12
+                    size = 0.5,
+                    start = 0,
+                    end = 6
                   )) %>% #"fill" is default, which is no gradient
 
     layout(title = "FT Biofuels",
                     xaxis = list(
                       title = "Conversion Efficiency (kg biomass / kg fuel)",
-                      nticks = 8
+                      nticks = 5
                     ),
                     yaxis = list(
                       title = "Cost of Delivered Biomass (USD / kg biomass)",
-                      nticks = 10
+                      nticks = 8
                     ),
                    margin = list (
                      b = 60,
@@ -523,19 +525,19 @@ orca(fig_FT, "fig4_FT_kg.svg")
 # Create a blank matrix
 # rows will be conversion efficiency (0 to 7)
 # columns will be biomass cost (0 to 0.9)
-z3_liters <- matrix(,nrow = length(biomass_cost), ncol = length(conv_eff))
+z3_liters <- matrix(,nrow = length(FT_cost), ncol = length(FT_conv_eff))
 
 # Iterate through arrays to populate matrix
-for (i in 1:length(biomass_cost)){
-  for (j in 1:length(conv_eff)){
-    z3_liters[i, j] <- ((biomass_cost[i] + a_FT) * biofuels_liter_multiplier * conv_eff[j])
+for (i in 1:length(FT_cost)){
+  for (j in 1:length(FT_conv_eff)){
+    z3_liters[i, j] <- ((FT_cost[i] + a_FT) * biofuels_liter_multiplier * FT_conv_eff[j])
   }
 
 }
 
 # contour(z)
-fig_FT_liter <- plot_ly(x = conv_eff, # This represents columns
-                  y = biomass_cost, # This represents rows
+fig_FT_liter <- plot_ly(x = FT_conv_eff, # This represents columns
+                  y = FT_cost, # This represents rows
                   z = z3_liters,
                   type = "contour",
                   colors = colors_figures_2,
@@ -547,19 +549,19 @@ fig_FT_liter <- plot_ly(x = conv_eff, # This represents columns
                   contours = list(
                     showlabels = TRUE,
                     coloring = "heatmap",
-                    size = 1,
+                    size = 0.5,
                     start = 0,
-                    end = 12
+                    end = 6
                   )) %>% #"fill" is default, which is no gradient
 
   layout(title = "FT Biofuels",
          xaxis = list(
            title = "Conversion Efficiency (kg biomass / kg fuel)",
-           nticks = 8
+           nticks = 5
          ),
          yaxis = list(
            title = "Cost of Delivered Biomass (USD / kg biomass)",
-           nticks = 10
+           nticks = 8
          ),
          margin = list (
            b = 60,
@@ -586,19 +588,18 @@ orca(fig_FT_liter, "fig4_FT_liter.svg")
 # Create a blank matrix
 # rows will be conversion efficiency (0 to 7)
 # columns will be biomass cost (0 to 0.9)
-z3_liters_with_CDR <- matrix(,nrow = length(biomass_cost), ncol = length(conv_eff))
+z3_liters_with_CDR <- matrix(,nrow = length(FT_cost), ncol = length(FT_conv_eff))
 
 # Iterate through arrays to populate matrix
-for (i in 1:length(biomass_cost)){
-  for (j in 1:length(conv_eff)){
-    z3_liters_with_CDR[i, j] <- ((biomass_cost[i] + a_FT) * biofuels_liter_multiplier * conv_eff[j]) + biofuel_offset_cost
+for (i in 1:length(FT_cost)){
+  for (j in 1:length(FT_conv_eff)){
+    z3_liters_with_CDR[i, j] <- ((FT_cost[i] + a_FT) * biofuels_liter_multiplier * FT_conv_eff[j]) + biofuel_offset_cost
   }
-  
 }
 
 # contour(z)
-fig_FT_liter_with_CDR <- plot_ly(x = conv_eff, # This represents columns
-                        y = biomass_cost, # This represents rows
+fig_FT_liter_with_CDR <- plot_ly(x = FT_conv_eff, # This represents columns
+                        y = FT_cost, # This represents rows
                         z = z3_liters_with_CDR,
                         type = "contour",
                         colors = colors_figures_2,
@@ -610,9 +611,9 @@ fig_FT_liter_with_CDR <- plot_ly(x = conv_eff, # This represents columns
                         contours = list(
                           showlabels = TRUE,
                           coloring = "heatmap",
-                          size = 1,
+                          size = 0.5,
                           start = 0,
-                          end = 12
+                          end = 6
                         )) %>% #"fill" is default, which is no gradient
   
   layout(title = "FT Biofuels with CDR",
